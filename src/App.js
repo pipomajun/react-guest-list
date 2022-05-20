@@ -19,7 +19,8 @@ function App() {
 
     fetchData().catch(() => {});
   }, []);
-  //
+  // refetch after guests are removed
+
   // create/add new guest
   const addNewGuest = async () => {
     const response = await fetch(baseUrl, {
@@ -47,29 +48,47 @@ function App() {
     setLastName('');
     setIsAttending(false);
   };
-  // DELETE GUEST BUTTON
-  const deleteGuest = async (guest) => {
-    const response = await fetch(`${baseUrl}/${guest}`, {
+
+  // change attending
+  // const changeAttending = async (id) => {
+  //   const response = await fetch(`${baseUrl}/${id}`, {
+  //     method: 'PUT',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({ isAttending: true }),
+  //   });
+  //   const updatedGuest = await response.json();
+  // };
+  // response.status===200 ? isAttending:true : isAttending: false;
+  // delete guest
+  const deleteGuest = async (id) => {
+    const response = await fetch(`${baseUrl}/${id}`, {
       method: 'DELETE',
     });
     const deletedGuest = await response.json();
+    response.status === 200
+      ? setGuestList(guestList.filter((guest) => guest.id !== deletedGuest.id))
+      : alert('Deleting this guest failed!');
   };
+
   // delete all guests button
-  const deleteAllGuests = async () => {
-    for (let i = 0; i < guestList.length; i++) {
-      const currentGuestId = guestList[i].id;
-      const response = await fetch(`${baseUrl}/${currentGuestId}`, {
-        method: 'DELETE',
-      });
-      response.status === 200
-        ? setGuestList([])
-        : alert('Clearing guest list failed!');
-    }
-  };
+  // const deleteAllGuests = async () => {
+  //   for (let i = 0; i < guestList.length; i++) {
+  //     const currentGuestId = guestList[i].id;
+  //     const response = await fetch(`${baseUrl}/${currentGuestId}`, {
+  //       method: 'DELETE',
+  //     });
+  //     response.status === 200
+  //       ? setGuestList([])
+  //       : alert('Clearing guest list failed!');
+  //   }
+  // };
   //
   // loading function while fetching
   // {isLoading ? "Loading..." : ""} maybe inside a div?
   //
+
   return (
     <div className="App">
       <header className="App-header">
@@ -104,17 +123,26 @@ function App() {
                 <div key={guest.id}>
                   <li>
                     {guest.firstName} {guest.lastName}
-                    <input type="checkbox" checked={guest.isAttending} />
-                    <button onClick={deleteGuest}>Delete guest</button>
+                    <input
+                      type="checkbox"
+                      checked={guest.isAttending}
+                      onChange={(event) => {
+                        setIsAttending(event.currentTarget.checked);
+                      }}
+                    />{' '}
+                    {isAttending ? '✅' : '🛑'}
+                    <button onClick={() => deleteGuest(guest.id)}>
+                      Remove
+                    </button>
                   </li>
                 </div>
               );
             })}
           </ul>
         </div>
-        <div>
+        {/* <div>
           <button onClick={() => deleteAllGuests()}>Delete all guests</button>
-        </div>
+        </div> */}
       </main>
     </div>
   );
