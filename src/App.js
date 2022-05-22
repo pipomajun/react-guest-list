@@ -125,14 +125,14 @@ function App() {
 
           <button>Add guest</button>
         </form>
-        <div className="showGuests" data-test-id="guest">
+        <div className="showGuests">
           {isLoading ? (
             'Loading...'
           ) : (
             <ul>
               {guestList.map((guest) => {
                 return (
-                  <div key={guest.id}>
+                  <div key={guest.id} data-test-id="guest">
                     <li>
                       {guest.firstName} {guest.lastName}
                       <input
