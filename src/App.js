@@ -1,16 +1,18 @@
-import { useState, useEffect } from 'react';
 import './App.css';
+import { useEffect, useState } from 'react';
 
 function App() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [guestList, setGuestList] = useState([]);
   const [isAttending, setIsAttending] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const baseUrl = 'http://localhost:4000/guests';
-  // get guest from base url (localhost:4000)
+
+  // FETCH DATA FROM BASE URL
   useEffect(() => {
     async function fetchData() {
+      setIsLoading(true);
       const response = await fetch(baseUrl);
       const data = await response.json();
       setGuestList(data);
@@ -19,9 +21,8 @@ function App() {
 
     fetchData().catch(() => {});
   }, []);
-  // refetch after guests are removed
 
-  // create/add new guest
+  // ADD NEW GUEST
   const addNewGuest = async () => {
     const response = await fetch(baseUrl, {
       method: 'POST',
@@ -31,13 +32,14 @@ function App() {
       body: JSON.stringify({
         firstName: firstName,
         lastName: lastName,
+        isAttending: false,
       }),
     });
     const addedGuest = await response.json();
     setGuestList([...guestList, addedGuest]);
   };
-  //
-  // submit names and prevent default
+
+  // SUBMIT NAMES AND PREVENT DEFAULT
   const submitName = (event) => {
     event.preventDefault();
     if (!firstName || !lastName) {
@@ -49,30 +51,40 @@ function App() {
     setIsAttending(false);
   };
 
-  // change attending
-  // const changeAttending = async (id) => {
-  //   const response = await fetch(`${baseUrl}/${id}`, {
-  //     method: 'PUT',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({ isAttending: true }),
-  //   });
-  //   const updatedGuest = await response.json();
-  // };
-  // response.status===200 ? isAttending:true : isAttending: false;
-  // delete guest
+  // CHANGE ATTENDING STATUS
+  const changeAttending = async (id, status) => {
+    const response = await fetch(`${baseUrl}/${guestList.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ attending: guestList.isAttending }),
+    });
+    const updatedGuest = await response.json();
+    console.log(updatedGuest);
+
+    const newGuestList = [...guestList];
+    const findGuest = newGuestList.find((guest) => guest.id === id);
+    findGuest.attending = status;
+
+    console.log(findGuest);
+
+    setGuestList(newGuestList);
+    return updatedGuest;
+  };
+
+  // DELETE SINGLE GUEST
   const deleteGuest = async (id) => {
     const response = await fetch(`${baseUrl}/${id}`, {
       method: 'DELETE',
     });
     const deletedGuest = await response.json();
-    response.status === 200
-      ? setGuestList(guestList.filter((guest) => guest.id !== deletedGuest.id))
-      : alert('Deleting this guest failed!');
+    console.log(deletedGuest);
+    const newGuestList = guestList.filter((guest) => guest.id !== id);
+    setGuestList(newGuestList);
   };
 
-  // delete all guests button
+  // DELETE ALL GUESTS
   // const deleteAllGuests = async () => {
   //   for (let i = 0; i < guestList.length; i++) {
   //     const currentGuestId = guestList[i].id;
@@ -84,10 +96,6 @@ function App() {
   //       : alert('Clearing guest list failed!');
   //   }
   // };
-  //
-  // loading function while fetching
-  // {isLoading ? "Loading..." : ""} maybe inside a div?
-  //
 
   return (
     <div className="App">
@@ -103,6 +111,7 @@ function App() {
               placeholder="First Name"
               value={firstName}
               onChange={(event) => setFirstName(event.target.value)}
+              disabled={isLoading ? 'disabled' : ''}
             />
           </label>
           <label>
@@ -111,34 +120,42 @@ function App() {
               placeholder="Last Name"
               value={lastName}
               onChange={(event) => setLastName(event.target.value)}
+              disabled={isLoading ? 'disabled' : ''}
             />
           </label>
           <button>Add guest</button>
         </form>
         <div className="showGuests" data-test-id="guest">
-          {/* loading function here?*/}
-          <ul>
-            {guestList.map((guest) => {
-              return (
-                <div key={guest.id}>
-                  <li>
-                    {guest.firstName} {guest.lastName}
-                    <input
-                      type="checkbox"
-                      checked={guest.isAttending}
-                      onChange={(event) => {
-                        setIsAttending(event.currentTarget.checked);
-                      }}
-                    />{' '}
-                    {isAttending ? '✅' : '🛑'}
-                    <button onClick={() => deleteGuest(guest.id)}>
-                      Remove
-                    </button>
-                  </li>
-                </div>
-              );
-            })}
-          </ul>
+          {isLoading ? (
+            'Loading...'
+          ) : (
+            <ul>
+              {guestList.map((guest) => {
+                return (
+                  <div key={guest.id}>
+                    <li>
+                      {guest.firstName} {guest.lastName}
+                      <input
+                        type="checkbox"
+                        aria-label="attending"
+                        checked={guest.attending}
+                        onChange={(event) => {
+                          changeAttending(
+                            guest.id,
+                            event.currentTarget.checked,
+                          ).catch(() => {});
+                        }}
+                      />{' '}
+                      {guest.attending ? '✅' : '🛑'}
+                      <button onClick={() => deleteGuest(guest.id)}>
+                        Remove
+                      </button>
+                    </li>
+                  </div>
+                );
+              })}
+            </ul>
+          )}
         </div>
         {/* <div>
           <button onClick={() => deleteAllGuests()}>Delete all guests</button>
