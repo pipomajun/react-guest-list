@@ -52,13 +52,36 @@ function App() {
   };
 
   // CHANGE ATTENDING STATUS
+  // function handleEdit(id, isChecked) {
+  //   async function editGuest() {
+  //     const response = await fetch(`${baseUrl}/guests/${id}`, {
+  //       method: 'PUT',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ attending: isChecked }),
+  //     });
+  //     const updatedGuest = await response.json();
+  //     console.log(updatedGuest);
+
+  //     const guestListCopy = [...guestList];
+  //     const findGuest = guestListCopy.find((guest) => guest.id === id);
+  //     findGuest.attending = isChecked;
+
+  //     console.log(findGuest);
+
+  //     setGuestList(guestListCopy);
+  //     return updatedGuest;
+  //   }
+  //   editGuest().catch(() => {});
+  // }
   const changeAttending = async (id, status) => {
-    const response = await fetch(`${baseUrl}/${guestList.id}`, {
+    const response = await fetch(`${baseUrl}/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ attending: guestList.isAttending }),
+      body: JSON.stringify({ attending: status }),
     });
     const updatedGuest = await response.json();
     console.log(updatedGuest);
