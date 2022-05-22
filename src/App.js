@@ -7,7 +7,7 @@ function App() {
   const [guestList, setGuestList] = useState([]);
   const [isAttending, setIsAttending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const baseUrl = 'http://localhost:4000/guests';
+  const baseUrl = 'https://react-guest-list-by-pipo.herokuapp.com/guests';
 
   // FETCH DATA FROM BASE URL
   useEffect(() => {
@@ -106,7 +106,7 @@ function App() {
       <main>
         <form onSubmit={submitName}>
           <label>
-            First Name
+            First name
             <input
               placeholder="First Name"
               value={firstName}
@@ -115,7 +115,7 @@ function App() {
             />
           </label>
           <label>
-            Last Name
+            Last name
             <input
               placeholder="Last Name"
               value={lastName}
