@@ -32,7 +32,6 @@ function App() {
       body: JSON.stringify({
         firstName: firstName,
         lastName: lastName,
-        isAttending: false,
       }),
     });
     const addedGuest = await response.json();
