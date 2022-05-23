@@ -1,4 +1,5 @@
 import './index.css';
+import { css, Global } from '@emotion/react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -7,6 +8,26 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+    <Global
+      styles={css`
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: 'Source Code Pro', monospace;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+        *,
+        ::before,
+        ::after {
+          box-sizing: border-box;
+        }
+        code {
+          font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+            monospace;
+        }
+      `}
+    />
     <App />
   </React.StrictMode>,
 );
