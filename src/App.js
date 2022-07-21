@@ -147,11 +147,13 @@ function App() {
     event.preventDefault();
     if (!firstName || !lastName) {
       alert('We need a first and last name to add you to the list!');
+      return;
+    } else {
+      addNewGuest((firstName, lastName, isAttending)).catch(() => {});
+      setFirstName('');
+      setLastName('');
+      setIsAttending(false);
     }
-    addNewGuest((firstName, lastName, isAttending)).catch(() => {});
-    setFirstName('');
-    setLastName('');
-    setIsAttending(false);
   };
 
   // CHANGE ATTENDING STATUS
@@ -169,9 +171,6 @@ function App() {
     const newGuestList = [...guestList];
     const findGuest = newGuestList.find((guest) => guest.id === id);
     findGuest.attending = status;
-
-    console.log(findGuest);
-
     setGuestList(newGuestList);
     return updatedGuest;
   };
@@ -182,23 +181,24 @@ function App() {
       method: 'DELETE',
     });
     const deletedGuest = await response.json();
-    console.log(deletedGuest);
-    const newGuestList = guestList.filter((guest) => guest.id !== id);
+    const newGuestList = guestList.filter(
+      (guest) => guest.id !== deletedGuest.id,
+    );
     setGuestList(newGuestList);
   };
 
   // DELETE ALL GUESTS
-  // const deleteAllGuests = async () => {
-  //   for (let i = 0; i < guestList.length; i++) {
-  //     const currentGuestId = guestList[i].id;
-  //     const response = await fetch(`${baseUrl}/${currentGuestId}`, {
-  //       method: 'DELETE',
-  //     });
-  //     response.status === 200
-  //       ? setGuestList([])
-  //       : alert('Clearing guest list failed!');
-  //   }
-  // };
+  const deleteAllGuests = async () => {
+    for (let i = 0; i < guestList.length; i++) {
+      const currentGuestId = guestList[i].id;
+      const response = await fetch(`${baseUrl}/${currentGuestId}`, {
+        method: 'DELETE',
+      });
+      response.status === 200
+        ? setGuestList([])
+        : alert('Clearing guest list failed!');
+    }
+  };
 
   return (
     <div css={bodyStyles} className="App">
@@ -265,9 +265,9 @@ function App() {
             </ul>
           )}
         </div>
-        {/* <div className="deleteAll">
+        <div className="deleteAll">
           <button onClick={() => deleteAllGuests()}>Delete all guests</button>
-        </div> */}
+        </div>
       </main>
     </div>
   );
